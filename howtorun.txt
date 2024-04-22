@@ -1,0 +1,2 @@
+g++ main.cpp -o app -framework OpenGL -framework GLUT -DGL_SILENCE_DEPRECATION
+
