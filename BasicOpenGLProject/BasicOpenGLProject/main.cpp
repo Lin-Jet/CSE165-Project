@@ -80,10 +80,23 @@ int timerID;
 // Counter for squares changed back to brown
 int brownCount = 0;
 
+bool squareHover[6] = {false, false, false, false, false, false};
+
 // Check if a point (x, y) is inside the square at (sx, sy)
-bool isInsideSquare(float x, float y, float sx, float sy) {
-    return (x >= sx - 0.1f && x <= sx + 0.1f && y >= sy - 0.1f && y <= sy + 0.1f);
+// bool isInsideSquare(float x, float y, float sx, float sy) {
+//     return (x >= sx - 0.1f && x <= sx + 0.1f && y >= sy - 0.1f && y <= sy + 0.1f);
+// }
+bool isInsideTriangle(float x, float y, float x1, float y1, float x2, float y2, float x3, float y3) {
+    // Compute barycentric coordinates
+    float denominator = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
+    float alpha = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / denominator;
+    float beta = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / denominator;
+    float gamma = 1.0f - alpha - beta;
+
+    // Check if the point is inside the triangle
+    return alpha > 0 && beta > 0 && gamma > 0;
 }
+
 
 // Randomly change the color of squares
 void changeSquareColors(int value) {
@@ -148,12 +161,16 @@ void key_released(unsigned char key, int x, int y) {
     }
 }
 
-void drawSquare(float x, float y, bool isRed) {
+void drawSquare(float x, float y, bool isRed, bool isHovering) {
     glBegin(GL_QUADS);
-    if (isRed) {
-        glColor3f(1.0f, 0.0f, 0.0f); // Red color
+    if (isHovering) {
+        glColor3f(0.0f, 1.0f, 0.0f); // Green color when hovering
     } else {
-        glColor3f(0.6f, 0.3f, 0.0f); // Brown color
+        if (isRed) {
+            glColor3f(1.0f, 0.0f, 0.0f); // Red color
+        } else {
+            glColor3f(0.6f, 0.3f, 0.0f); // Brown color
+        }
     }
     glVertex2f(x - 0.1f, y - 0.1f);
     glVertex2f(x + 0.1f, y - 0.1f);
@@ -167,7 +184,7 @@ void display_func(void) {
 
     // Draw squares
     for (int i = 0; i < 6; ++i) {
-        drawSquare(squarePositions[i][0], squarePositions[i][1], squareColors[i]);
+        drawSquare(squarePositions[i][0], squarePositions[i][1], squareColors[i], squareHover[i]);
     }
 
     // Update triangle position based on key presses
@@ -176,13 +193,19 @@ void display_func(void) {
     if (keyS && triangleY - movementSpeed >= -1.2f) triangleY -= movementSpeed;
     if (keyD && triangleX + movementSpeed <= 0.8f) triangleX += movementSpeed;
 
+    // Check if the space bar is pressed and handle interactions
     if (keySpace) {
         std::cout << "space pressed" << std::endl;
+        bool squareChanged = false; // Flag to track if any square color was changed
+    
         for (int i = 0; i < 6; ++i) {
-            if (isInsideSquare(triangleX, triangleY, squarePositions[i][0], squarePositions[i][1])) {
+            if (isInsideTriangle(triangleX, triangleY, 
+                                 squarePositions[i][0] - 0.1f, squarePositions[i][1] - 0.1f, 
+                                 squarePositions[i][0] + 0.1f, squarePositions[i][1] - 0.1f, 
+                                 squarePositions[i][0], squarePositions[i][1] + 0.1f)) {
                 std::cout << "is in square: (" << squarePositions[i][0] << ", " <<  squarePositions[i][1] << ")" << std::endl;
-
-                drawSquare(squarePositions[i][0], squarePositions[i][1], false);
+    
+                drawSquare(squarePositions[i][0], squarePositions[i][1], false, squareHover[i]);
                 std::cout << "square color changed" << std::endl; 
                 brownCount++;
                 std::cout << "count: " << brownCount << std::endl; 
@@ -191,12 +214,24 @@ void display_func(void) {
                 if (squareColors[i]) {
                     squareColors[i] = false;
                     std::cout << "color changed" << std::endl;
-                    brownCount++; // Increment the counter
-                    std::cout << "count: " << brownCount << std::endl; 
+                    squareChanged = true;
                     break; // Exit the loop after changing the color of the first touched square
                 }
             }
         }
+    
+        // Increment the brown count only if a square color was changed
+        if (squareChanged) {
+            brownCount++;
+            std::cout << "count: " << brownCount << std::endl;
+        }
+    }
+
+    for (int i = 0; i < 6; ++i) {
+        squareHover[i] = isInsideTriangle(triangleX, triangleY, 
+                                           squarePositions[i][0] - 0.1f, squarePositions[i][1] - 0.1f, 
+                                           squarePositions[i][0] + 0.1f, squarePositions[i][1] - 0.1f, 
+                                           squarePositions[i][0], squarePositions[i][1] + 0.1f);
     }
 
     // Draw the triangle at its updated position
@@ -212,6 +247,7 @@ void display_func(void) {
 
     glutSwapBuffers();
 }
+
 
 // INIT
 void init(void) {
