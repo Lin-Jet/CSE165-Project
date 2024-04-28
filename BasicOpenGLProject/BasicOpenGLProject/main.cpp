@@ -226,16 +226,19 @@ void changeSquareColors(int value) {
     if (maxTime > 0) {
         glutTimerFunc(timerInterval, changeSquareColors, 0);
     } else {
-        // Ran out of time
+        // Ran out of time text
         std::string outOfTimeMessage = "Ran out of time!";
         std::string studentsHelpedMessage = "Number of students you've helped: " + std::to_string(brownCount);
         int endx = 100;
         int endy = 100;
         renderText(outOfTimeMessage, endx, endy);
         renderText(studentsHelpedMessage, endx, endy);
+        glutPostRedisplay();
+        std::cout << outOfTimeMessage << std::endl << studentsHelpedMessage << std::endl;
 
         // Delay before terminating
         glutTimerFunc(8000, terminateCode, 0);
+        
     }
 }
 
@@ -391,7 +394,7 @@ void display_func(void) {
                 if (squareChanged) {
                     brownCount++;
                     drawSquare(squarePositions[i][0], squarePositions[i][1], false, squareHover[i]);
-                    std::cout << "count: " << brownCount << std::endl;
+                    std::cout << "Score: " << brownCount << std::endl;
                 }
             }
         }
