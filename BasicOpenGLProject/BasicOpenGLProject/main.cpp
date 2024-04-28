@@ -150,6 +150,7 @@ int timerInterval = 500; // half a second
 int timerID;
 int maxTime = 20000; // 20 seconds
 
+
 // Counter for squares changed back to brown
 int brownCount = 0;
 
@@ -184,31 +185,6 @@ void terminateCode(int value){
     exit(0);
 }
 
-
-// Randomly change the color of squares
-void changeSquareColors(int value) {
-    maxTime -= timerInterval;
-    for (int i = 0; i < 6; ++i) {
-        squareColors[i] = (rand() % 2 == 0); // Randomly set square color to red or brown
-    }
-    glutPostRedisplay();
-    // Restart the timer for the next color change
-    if (maxTime > 0) {
-        glutTimerFunc(timerInterval, changeSquareColors, 0);
-    } else {
-        // Ran out of time
-        std::string outOfTimeMessage = "Ran out of time!";
-        std::string studentsHelpedMessage = "Number of students you've helped: " + std::to_string(brownCount);
-
-        renderText(outOfTimeMessage, 50, 200);
-        renderText(studentsHelpedMessage, 50, 190);
-
-        // Delay before terminating
-        glutTimerFunc(8000, terminateCode, 0);
-    }
-}
-
-
 void renderText(const std::string& text, int xPos, int yPos) {
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -237,6 +213,30 @@ void renderText(const std::string& text, int xPos, int yPos) {
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
 }
+
+// Randomly change the color of squares
+void changeSquareColors(int value) {
+    maxTime -= timerInterval;
+    for (int i = 0; i < 6; ++i) {
+        squareColors[i] = (rand() % 2 == 0); // Randomly set square color to red or brown
+    }
+    glutPostRedisplay();
+    // Restart the timer for the next color change
+    if (maxTime > 0) {
+        glutTimerFunc(timerInterval, changeSquareColors, 0);
+    } else {
+        // Ran out of time
+        std::string outOfTimeMessage = "Ran out of time!";
+        std::string studentsHelpedMessage = "Number of students you've helped: " + std::to_string(brownCount);
+
+        renderText(outOfTimeMessage, 50, 200);
+        renderText(studentsHelpedMessage, 50, 190);
+
+        // Delay before terminating
+        glutTimerFunc(8000, terminateCode, 0);
+    }
+}
+
 
 
 // CALLBACKS
@@ -425,7 +425,10 @@ void display_func(void) {
 
     renderText(text, xPos, yPos);
 
-    
+    int timexPos = 30;
+    int timeyPos = 200;
+    std::string timetext = "Time: " + std::to_string(maxTime/1000) + " seconds left!";
+    renderText(timetext, timexPos, timeyPos);
 
     glutSwapBuffers();
 }
@@ -443,6 +446,9 @@ void init(void) {
 
     std::cout << "Finished initializing...\n\n";
 }
+
+
+
 
 // MAIN
 int main(int argc, char** argv) {
