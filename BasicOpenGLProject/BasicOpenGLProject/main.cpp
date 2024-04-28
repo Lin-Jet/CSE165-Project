@@ -148,7 +148,7 @@ bool keySpace = false;
 int timerInterval = 500; // half a second
 // Timer ID
 int timerID;
-int maxTime = 20000; // 20 seconds
+int maxTime = 10000; // 20 seconds
 
 
 // Counter for squares changed back to brown
@@ -226,19 +226,8 @@ void changeSquareColors(int value) {
     if (maxTime > 0) {
         glutTimerFunc(timerInterval, changeSquareColors, 0);
     } else {
-        // Ran out of time text
-        std::string outOfTimeMessage = "Ran out of time!";
-        std::string studentsHelpedMessage = "Number of students you've helped: " + std::to_string(brownCount);
-        int endx = 100;
-        int endy = 100;
-        renderText(outOfTimeMessage, endx, endy);
-        renderText(studentsHelpedMessage, endx, endy);
-        glutPostRedisplay();
-        std::cout << outOfTimeMessage << std::endl << studentsHelpedMessage << std::endl;
-
         // Delay before terminating
         glutTimerFunc(8000, terminateCode, 0);
-        
     }
 }
 
@@ -434,6 +423,15 @@ void display_func(void) {
     int timeyPos = 200;
     std::string timetext = "Time: " + std::to_string(maxTime/1000) + " seconds left!";
     renderText(timetext, timexPos, timeyPos);
+
+    if(maxTime == 0){
+        std::string outOfTimeMessage = "Ran out of time!";
+        std::string studentsHelpedMessage = "Number of students you've helped: " + std::to_string(brownCount);
+        int endx = 300;
+        int endy = 300;
+        renderText(outOfTimeMessage, endx, endy);
+        renderText(studentsHelpedMessage, endx, endy-50);
+    }
 
     glutSwapBuffers();
 }
