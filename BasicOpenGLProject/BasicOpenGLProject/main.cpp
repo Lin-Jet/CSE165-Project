@@ -148,7 +148,7 @@ bool keySpace = false;
 int timerInterval = 500; // half a second
 // Timer ID
 int timerID;
-int maxTime = 10000; // 20 seconds
+int maxTime = 20000; // 20 seconds
 
 
 // Counter for squares changed back to brown
@@ -415,7 +415,7 @@ void display_func(void) {
     int xPos = 30; // Initial X position
     int yPos = 100; // Initial Y position
 
-    std::string text = "Goal: Help as many students within 30 seconds!\nAbilities!\n\tMovement: W,A,S,D keys\n\tHelp students: Press space key\nNumber of students you've helped: " + std::to_string(brownCount);
+    std::string text = "Goal: Help as many students within 20 seconds!\nAbilities!\n\tMovement: W,A,S,D keys\n\tHelp students: Press space key\nNumber of students you've helped: " + std::to_string(brownCount);
 
     renderText(text, xPos, yPos);
 
@@ -425,12 +425,10 @@ void display_func(void) {
     renderText(timetext, timexPos, timeyPos);
 
     if(maxTime == 0){
-        std::string outOfTimeMessage = "Ran out of time!";
-        std::string studentsHelpedMessage = "Number of students you've helped: " + std::to_string(brownCount);
+        std::string outOfTimeMessage = std::string("Ran out of time!\n") +" Number of students you've helped: " + std::to_string(brownCount);
         int endx = 300;
         int endy = 300;
         renderText(outOfTimeMessage, endx, endy);
-        renderText(studentsHelpedMessage, endx, endy-50);
     }
 
     glutSwapBuffers();
