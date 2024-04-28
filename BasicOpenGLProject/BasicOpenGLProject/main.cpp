@@ -123,7 +123,7 @@ public:
 
 // Triangle position
 float triangleX = 0.0f;
-float triangleY = -0.3f;
+float triangleY = -0.4f;
 
 // Square positions
 float squarePositions[6][2] = {
@@ -196,16 +196,16 @@ void renderText(const std::string& text, int xPos, int yPos) {
     glLoadIdentity();
     glColor3f(1.0f, 1.0f, 1.0f); // Set text color to white
 
-    for (unsigned int i = 0; i < text.size(); ++i) {
+    for (int i = 0; i < text.size(); ++i) {
         if (text[i] == '\n') {
-            yPos -= 20; // Move to the next line
+            yPos -= 24; // Move to the next line 
             xPos = 30; // Reset X position
         } else if (text[i] == '\t') {
-            xPos += 40; // Move to the next tab position
+            xPos += 48; // Move to the next tab position 
         } else {
             glRasterPos2i(xPos, yPos); // Set position for the text
-            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, text[i]); // Render each character
-            xPos += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, text[i]); // Move X position by character width
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]); // Render each character with larger font
+            xPos += glutBitmapWidth(GLUT_BITMAP_HELVETICA_18, text[i]); // Move X position by character width
         }
     }
 
@@ -412,22 +412,21 @@ void display_func(void) {
     glPopMatrix();
 
     // Render text
-    int xPos = 30; // Initial X position
-    int yPos = 100; // Initial Y position
-
-    std::string text = "Goal: Help as many students within 20 seconds!\nAbilities!\n\tMovement: W,A,S,D keys\n\tHelp students: Press space key\nNumber of students you've helped: " + std::to_string(brownCount);
-
-    renderText(text, xPos, yPos);
-
     int timexPos = 30;
     int timeyPos = 200;
     std::string timetext = "Time: " + std::to_string(maxTime/1000) + " seconds left!";
     renderText(timetext, timexPos, timeyPos);
 
+    int xPos = 30; // Initial X position
+    int yPos = 130; // Initial Y position
+    std::string text = "Goal: Help as many students within 20 seconds!\nAbilities!\n\tMovement: W,A,S,D keys\n\tHelp students: Press space key\nNumber of students you've helped: " + std::to_string(brownCount);
+    renderText(text, xPos, yPos);
+
+    
     if(maxTime == 0){
-        std::string outOfTimeMessage = std::string("Ran out of time!\n") +" Number of students you've helped: " + std::to_string(brownCount);
-        int endx = 300;
-        int endy = 300;
+        std::string outOfTimeMessage ="Ran out of time!\n\t\t\t\t     Number of students you've helped: " + std::to_string(brownCount);
+        int endx = 330;
+        int endy = 400;
         renderText(outOfTimeMessage, endx, endy);
     }
 
