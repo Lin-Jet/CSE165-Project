@@ -5,7 +5,7 @@
 #include <ctime>
 
 void drawHalfCircle(float x, float y, float radius) {
-   glColor3f(1.0f, 0.0f, 0.0f);
+   glColor3f(0.8588f, 0.6824f, 0.5804f);
    glBegin(GL_LINE_LOOP); // Draw a line loop to connect segments
    for (int i = 90; i <= 270; ++i) {
        float angle = 2.0f * M_PI * (float)i / 360.0f;
@@ -20,7 +20,7 @@ void drawPeople(float x, float y, bool isRed, bool isTeacher){
 
    // Body
     glBegin(GL_QUADS);
-    glColor3f(1.0f, 1.0f, 0.0f);
+    glColor3f(1.0f, 0.7961f, 0.4118f);
     glVertex2f(x - 0.05f, y - 0.1f);
     glVertex2f(x + 0.05f, y - 0.1f);
     glVertex2f(x + 0.05f, y + 0.1f);
@@ -30,9 +30,10 @@ void drawPeople(float x, float y, bool isRed, bool isTeacher){
     // Shirt
     glBegin(GL_QUADS);
     if(isTeacher){
-        glColor3f(0.68f, 0.84f, 0.9f); 
+        glColor3f(0.8588f, 0.6824f, 0.5804f);
     }else{
-        glColor3f(0.0f, 0.0f, 1.0f); 
+        glColor3f(0.4706f, 0.4902f, 0.3843f);
+
     }
     glVertex2f(x - 0.05f, y - 0.1f);
     glVertex2f(x + 0.05f, y - 0.1f);
@@ -62,7 +63,7 @@ void drawPeople(float x, float y, bool isRed, bool isTeacher){
    // Raise hand
    if(isRed){
     glBegin(GL_LINES);
-    glColor3f(1.0f, 1.0f, 0.0f);
+    glColor3f(0.8588f, 0.6824f, 0.5804f);
     glVertex2f(x + 0.05f, y - 0.03f);
     glVertex2f(x + 0.1f, y + 0.03f);
     glLineWidth(8.0f);
@@ -110,7 +111,7 @@ public:
         if (isRed) {
             glColor3f(1.0f, 0.0f, 0.0f); // Red color
         } else {
-            glColor3f(0.6f, 0.3f, 0.0f); // Brown color
+            glColor3f(0.6000f, 0.4824f, 0.4000f); // Brown color
         }
         glVertex2f(x - 0.1f, y - 0.1f);
         glVertex2f(x + 0.1f, y - 0.1f);
@@ -192,15 +193,44 @@ void changeSquareColors(int value) {
     }
     glutPostRedisplay();
     // Restart the timer for the next color change
-    if(maxTime > 0){
+    if (maxTime > 0) {
         glutTimerFunc(timerInterval, changeSquareColors, 0);
-    }else{
-        // Terminates Code here!
-        std::cout << "Ran out of time!" << std::endl;
-        std::cout << "Number of students you've helped: " << brownCount << std::endl; // Print the count when the program exits
-        glutTimerFunc(4000, terminateCode, 0);
+    } else {
+        // Ran out of time
+        std::string outOfTimeMessage = "Ran out of time!";
+        std::string studentsHelpedMessage = "Number of students you've helped: " + std::to_string(brownCount);
+
+        renderText(outOfTimeMessage, 50, 200);
+        renderText(studentsHelpedMessage, 50, 190);
+
+        // Delay before terminating
+        glutTimerFunc(8000, terminateCode, 0);
     }
 }
+
+
+void renderText(const std::string& text, int xPos, int yPos) {
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, 800, 0, 600);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glColor3f(1.0f, 1.0f, 1.0f); // Set text color to white
+
+    for (unsigned int i = 0; i < text.size(); ++i) {
+        glRasterPos2i(xPos, yPos); // Set position for the text
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, text[i]); // Render each character
+        xPos += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, text[i]); // Move X position by character width
+    }
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+}
+
 
 // CALLBACKS
 void idle_func() {
@@ -261,12 +291,12 @@ void drawSquare(float x, float y, bool isRed, bool isHovering) {
 
     glBegin(GL_QUADS);
     if (isHovering && isRed) {
-        glColor3f(0.0f, 1.0f, 0.0f); // Green color when hovering (&& if it is Red!)
+        glColor3f(1.0f, 0.7961f, 0.4118f); // Green color when hovering (&& if it is Red!)
     } else {
         if (isRed) {
             glColor3f(1.0f, 0.0f, 0.0f); // Red color
         } else {
-            glColor3f(0.6f, 0.3f, 0.0f); // Brown color
+            glColor3f(0.6000f, 0.4824f, 0.4000f); // Brown color
         }
     }
     glVertex2f(x - 0.1f, y - 0.1f);
@@ -380,13 +410,48 @@ void display_func(void) {
     drawPeople(triangleX, triangleY, false, true);
     glPopMatrix();
 
+    // Render text
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, 800, 0, 600);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glColor3f(1.0f, 1.0f, 1.0f); // Set text color to white
+
+    int xPos = 30; // Initial X position
+    int yPos = 100; // Initial Y position
+
+    std::string text = "Goal: Help as many students within 30 seconds!\nAbilities!\n\tMovement: W,A,S,D keys\n\tHelp students: Press space key\nNumber of students you've helped: " + std::to_string(brownCount);
+
+    for (unsigned int i = 0; i < text.size(); ++i) {
+        if (text[i] == '\n') {
+            yPos -= 20; // Move to the next line
+            xPos = 30; // Reset X position
+        } else if (text[i] == '\t') {
+            xPos += 40; // Move to the next tab position
+        } else {
+            glRasterPos2i(xPos, yPos); // Set position for the text
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, text[i]); // Render each character
+            xPos += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, text[i]); // Move X position by character width
+        }
+    }
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+
+    
+
     glutSwapBuffers();
 }
 
 
 // INIT
 void init(void) {
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.6078f, 0.6078f, 0.4706f, 0.0f);
 
     // Seed random number generator
     srand(time(NULL));
