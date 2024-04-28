@@ -325,10 +325,10 @@ void display_func(void) {
     }
 
     // Update triangle position based on key presses
-    if (keyW && triangleY + movementSpeed <= 0.8f) triangleY += movementSpeed;
-    if (keyA && triangleX - movementSpeed >= -1.3f) triangleX -= movementSpeed;
-    if (keyS && triangleY - movementSpeed >= -1.2f) triangleY -= movementSpeed;
-    if (keyD && triangleX + movementSpeed <= 0.8f) triangleX += movementSpeed;
+    if (keyW && triangleY + movementSpeed <= 0.5f) triangleY += movementSpeed;
+    if (keyA && triangleX - movementSpeed >= -0.5f) triangleX -= movementSpeed;
+    if (keyS && triangleY - movementSpeed >= -0.5f) triangleY -= movementSpeed;
+    if (keyD && triangleX + movementSpeed <= 0.5f) triangleX += movementSpeed;
 
     // Check if the space bar is pressed and handle interactions
     /*
