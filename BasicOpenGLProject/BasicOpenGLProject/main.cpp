@@ -220,9 +220,16 @@ void renderText(const std::string& text, int xPos, int yPos) {
     glColor3f(1.0f, 1.0f, 1.0f); // Set text color to white
 
     for (unsigned int i = 0; i < text.size(); ++i) {
-        glRasterPos2i(xPos, yPos); // Set position for the text
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, text[i]); // Render each character
-        xPos += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, text[i]); // Move X position by character width
+        if (text[i] == '\n') {
+            yPos -= 20; // Move to the next line
+            xPos = 30; // Reset X position
+        } else if (text[i] == '\t') {
+            xPos += 40; // Move to the next tab position
+        } else {
+            glRasterPos2i(xPos, yPos); // Set position for the text
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, text[i]); // Render each character
+            xPos += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, text[i]); // Move X position by character width
+        }
     }
 
     glPopMatrix();
@@ -411,37 +418,12 @@ void display_func(void) {
     glPopMatrix();
 
     // Render text
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    gluOrtho2D(0, 800, 0, 600);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-    glColor3f(1.0f, 1.0f, 1.0f); // Set text color to white
-
     int xPos = 30; // Initial X position
     int yPos = 100; // Initial Y position
 
     std::string text = "Goal: Help as many students within 30 seconds!\nAbilities!\n\tMovement: W,A,S,D keys\n\tHelp students: Press space key\nNumber of students you've helped: " + std::to_string(brownCount);
 
-    for (unsigned int i = 0; i < text.size(); ++i) {
-        if (text[i] == '\n') {
-            yPos -= 20; // Move to the next line
-            xPos = 30; // Reset X position
-        } else if (text[i] == '\t') {
-            xPos += 40; // Move to the next tab position
-        } else {
-            glRasterPos2i(xPos, yPos); // Set position for the text
-            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, text[i]); // Render each character
-            xPos += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, text[i]); // Move X position by character width
-        }
-    }
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
-
+    renderText(text, xPos, yPos);
 
     
 
