@@ -179,6 +179,10 @@ bool isInsideTriangle(float x, float y, float rectX, float rectY){
     return answer;
 }
 
+void terminateCode(int value){
+    exit(0);
+}
+
 
 // Randomly change the color of squares
 void changeSquareColors(int value) {
@@ -194,7 +198,7 @@ void changeSquareColors(int value) {
         // Terminates Code here!
         std::cout << "Ran out of time!" << std::endl;
         std::cout << "Number of students you've helped: " << brownCount << std::endl; // Print the count when the program exits
-        exit(0);
+        glutTimerFunc(4000, terminateCode, 0);
     }
 }
 
