@@ -186,6 +186,7 @@ void terminateCode(int value){
 }
 
 void renderText(const std::string& text, int xPos, int yPos) {
+    // std::cout << text << std::endl;
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -228,9 +229,10 @@ void changeSquareColors(int value) {
         // Ran out of time
         std::string outOfTimeMessage = "Ran out of time!";
         std::string studentsHelpedMessage = "Number of students you've helped: " + std::to_string(brownCount);
-
-        renderText(outOfTimeMessage, 50, 200);
-        renderText(studentsHelpedMessage, 50, 190);
+        int endx = 100;
+        int endy = 100;
+        renderText(outOfTimeMessage, endx, endy);
+        renderText(studentsHelpedMessage, endx, endy);
 
         // Delay before terminating
         glutTimerFunc(8000, terminateCode, 0);
@@ -461,7 +463,7 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(100, 100);
     glutInitWindowSize(800, 600);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-    glutCreateWindow("Basic OpenGL Example");
+    glutCreateWindow("Tutoring Center Game");
 
     glutDisplayFunc(display_func);
     glutIdleFunc(idle_func);
