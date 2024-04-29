@@ -51,125 +51,133 @@ int brownCount = 0;
 bool squareHover[6] = {false, false, false, false, false, false};
 
 
-void drawHalfCircle(float x, float y, float radius) {
-    glColor3f(0.8588f, 0.6824f, 0.5804f);
-    glBegin(GL_LINE_LOOP); // Draw a line loop to connect segments
-    for (int i = 90; i <= 270; ++i) {
-        float angle = 2.0f * M_PI * (float)i / 360.0f;
-        float xPos = x + sin(angle) * radius;
-        float yPos = y + cos(angle) * radius;
-        glVertex2f(xPos, yPos);
-    }
-    glEnd();
-}
-
-void drawPeople(float x, float y, bool isRed, bool isTeacher){
-// Body
-    glBegin(GL_QUADS);
-    glColor3f(1.0f, 0.7961f, 0.4118f);
-    glVertex2f(x - 0.05f, y - 0.1f);
-    glVertex2f(x + 0.05f, y - 0.1f);
-    glVertex2f(x + 0.05f, y + 0.1f);
-    glVertex2f(x - 0.05f, y + 0.1f);
-    glEnd();
-
-    // Shirt
-    glBegin(GL_QUADS);
-    if(isTeacher){
-        glColor3f(0.8588f, 0.6824f, 0.5804f);
-    }else{
-        glColor3f(0.4706f, 0.4902f, 0.3843f);
-
-    }
-    glVertex2f(x - 0.05f, y - 0.1f);
-    glVertex2f(x + 0.05f, y - 0.1f);
-    glVertex2f(x + 0.05f, y - 0.03f);
-    glVertex2f(x - 0.05f, y - 0.03f);
-    glEnd();
-
-    // Left eye
-    glBegin(GL_QUADS);
-    glColor3f(0.0f, 0.0f, 0.0f);
-    glVertex2f(x - 0.03f, y + 0.075f);
-    glVertex2f(x - 0.01f, y + 0.075f);
-    glVertex2f(x - 0.01f, y + 0.025f);
-    glVertex2f(x - 0.03f, y + 0.025f);
-    glEnd();
-
-    // Right eye
-    glBegin(GL_QUADS);
-    glVertex2f(x + 0.03f, y + 0.075f);
-    glVertex2f(x + 0.01f, y + 0.075f);
-    glVertex2f(x + 0.01f, y + 0.025f);
-    glVertex2f(x + 0.03f, y + 0.025f);
-    glEnd();
-
-    drawHalfCircle(x, y + 0.01f, 0.02f);
-
-    // Raise hand
-    if(isRed){
-        glBegin(GL_LINES);
-        glColor3f(0.8588f, 0.6824f, 0.5804f);
-        glVertex2f(x + 0.05f, y - 0.03f);
-        glVertex2f(x + 0.1f, y + 0.03f);
-        glLineWidth(8.0f);
-        glEnd();
-
-        //Hand
-        glBegin(GL_QUADS);
-        glColor3f(1.0f, 0.7961f, 0.4118f);
-        glVertex2f(x + 0.1f, y + 0.03f);
-        glVertex2f(x + 0.05f, y - 0.03f);
-        glVertex2f(x + 0.05f, y - 0.05f);
-        glVertex2f(x + 0.1f, y + 0.01f);
-        glEnd();
-
-        // Sleeve
-        glBegin(GL_QUADS);
-        glColor3f(0.4706f, 0.4902f, 0.3843f);
-        glVertex2f(x + 0.08f, y + 0.02f);
-        glVertex2f(x + 0.05f, y - 0.003f);
-        glVertex2f(x + 0.05f, y - 0.05f);
-        glVertex2f(x + 0.08f, y - 0.02f);
-        glEnd();
-    }
-}
-
-void drawSquare(float x, float y, bool isRed, bool isHovering) {
-
-    drawPeople(x, y + 0.1f, isRed, false);
-
-    glBegin(GL_QUADS);
-    if (isHovering && isRed) {
-        glColor3f(1.0f, 0.7961f, 0.4118f); // Green color when hovering (&& if it is Red!)
-    } else {
-        if (isRed) {
-            glColor3f(1.0f, 0.0f, 0.0f); // Red color
-        } else {
-            glColor3f(0.6000f, 0.4824f, 0.4000f); // Brown color
-        }
-    }
-    glVertex2f(x - 0.1f, y - 0.1f);
-    glVertex2f(x + 0.1f, y - 0.1f);
-    glVertex2f(x + 0.1f, y + 0.02f);
-    glVertex2f(x - 0.1f, y + 0.02f);
-    glEnd();
-}
-
 class Student{
     float x;
     float y;
     bool isRed;
     bool isTutor = false;
 public:
+    Student(){}
+
     Student(float x, float y, bool isRed){
         this->x = x;
         this->y = y;
         this->isRed = isRed;
     }
 
+    void setStudent(float x, float y, bool isRed){
+        this->x = x;
+        this->y = y;
+        this->isRed = isRed;
+    }
+
     virtual void draw(){
-        drawSquare(x, y, isRed, isTutor);   
+        drawDesk(x, y, isRed, isTutor);   
+    }
+
+    void drawHalfCircle(float x, float y, float radius) {
+        glColor3f(0.8588f, 0.6824f, 0.5804f);
+        glBegin(GL_LINE_LOOP); // Draw a line loop to connect segments
+        for (int i = 90; i <= 270; ++i) {
+            float angle = 2.0f * M_PI * (float)i / 360.0f;
+            float xPos = x + sin(angle) * radius;
+            float yPos = y + cos(angle) * radius;
+            glVertex2f(xPos, yPos);
+        }
+        glEnd();
+    }
+
+    void drawPeople(float x, float y, bool isRed, bool isTeacher){
+    // Body
+        glBegin(GL_QUADS);
+        glColor3f(1.0f, 0.7961f, 0.4118f);
+        glVertex2f(x - 0.05f, y - 0.1f);
+        glVertex2f(x + 0.05f, y - 0.1f);
+        glVertex2f(x + 0.05f, y + 0.1f);
+        glVertex2f(x - 0.05f, y + 0.1f);
+        glEnd();
+
+        // Shirt
+        glBegin(GL_QUADS);
+        if(isTeacher){
+            glColor3f(0.8588f, 0.6824f, 0.5804f);
+        }else{
+            glColor3f(0.4706f, 0.4902f, 0.3843f);
+
+        }
+        glVertex2f(x - 0.05f, y - 0.1f);
+        glVertex2f(x + 0.05f, y - 0.1f);
+        glVertex2f(x + 0.05f, y - 0.03f);
+        glVertex2f(x - 0.05f, y - 0.03f);
+        glEnd();
+
+        // Left eye
+        glBegin(GL_QUADS);
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glVertex2f(x - 0.03f, y + 0.075f);
+        glVertex2f(x - 0.01f, y + 0.075f);
+        glVertex2f(x - 0.01f, y + 0.025f);
+        glVertex2f(x - 0.03f, y + 0.025f);
+        glEnd();
+
+        // Right eye
+        glBegin(GL_QUADS);
+        glVertex2f(x + 0.03f, y + 0.075f);
+        glVertex2f(x + 0.01f, y + 0.075f);
+        glVertex2f(x + 0.01f, y + 0.025f);
+        glVertex2f(x + 0.03f, y + 0.025f);
+        glEnd();
+
+        drawHalfCircle(x, y + 0.01f, 0.02f);
+
+        // Raise hand
+        if(isRed){
+            glBegin(GL_LINES);
+            glColor3f(0.8588f, 0.6824f, 0.5804f);
+            glVertex2f(x + 0.05f, y - 0.03f);
+            glVertex2f(x + 0.1f, y + 0.03f);
+            glLineWidth(8.0f);
+            glEnd();
+
+            //Hand
+            glBegin(GL_QUADS);
+            glColor3f(1.0f, 0.7961f, 0.4118f);
+            glVertex2f(x + 0.1f, y + 0.03f);
+            glVertex2f(x + 0.05f, y - 0.03f);
+            glVertex2f(x + 0.05f, y - 0.05f);
+            glVertex2f(x + 0.1f, y + 0.01f);
+            glEnd();
+
+            // Sleeve
+            glBegin(GL_QUADS);
+            glColor3f(0.4706f, 0.4902f, 0.3843f);
+            glVertex2f(x + 0.08f, y + 0.02f);
+            glVertex2f(x + 0.05f, y - 0.003f);
+            glVertex2f(x + 0.05f, y - 0.05f);
+            glVertex2f(x + 0.08f, y - 0.02f);
+            glEnd();
+        }
+    }
+
+    void drawDesk(float x, float y, bool isRed, bool isHovering) {
+
+        drawPeople(x, y + 0.1f, isRed, false);
+
+        glBegin(GL_QUADS);
+        if (isHovering && isRed) {
+            glColor3f(1.0f, 0.7961f, 0.4118f); // Green color when hovering (&& if it is Red!)
+        } else {
+            if (isRed) {
+                glColor3f(1.0f, 0.0f, 0.0f); // Red color
+            } else {
+                glColor3f(0.6000f, 0.4824f, 0.4000f); // Brown color
+            }
+        }
+        glVertex2f(x - 0.1f, y - 0.1f);
+        glVertex2f(x + 0.1f, y - 0.1f);
+        glVertex2f(x + 0.1f, y + 0.02f);
+        glVertex2f(x - 0.1f, y + 0.02f);
+        glEnd();
     }
 };
 
@@ -179,13 +187,20 @@ class Tutor : public Student{
     bool isRed;
     bool isTutor = true;
 public:
-    Tutor(float x = 0.0f, float y = -0.4f) : Student(x, y, false){}
+    Tutor() : Student(0.0f, -0.4f, false){}
 
     void draw(){
         drawPeople(x, y, isRed, isTutor);
     }
 
 };
+
+/* == Creating Tutor and 6 Students == */
+Tutor *you = new Tutor();
+Student *students = new Student[6];
+for(int i = 0; i < 6; i++){
+    students[i] = new Student(squarePositions[i][0], squarePositions[i][1], squareColors[i]);
+}
 
 bool isInsideDesk(float x, float y, float rectX, float rectY){
     bool answer = false;
@@ -197,6 +212,8 @@ bool isInsideDesk(float x, float y, float rectX, float rectY){
 }
 
 void terminateCode(int value){
+    delete you;
+
     exit(0);
 }
 
@@ -305,7 +322,7 @@ void display_func(void) {
 
     // Draw squares
     for (int i = 0; i < 6; ++i) {
-        drawSquare(squarePositions[i][0], squarePositions[i][1], squareColors[i], squareHover[i]);
+        drawDesk(squarePositions[i][0], squarePositions[i][1], squareColors[i], squareHover[i]);
     }
 
     // Update triangle position based on key presses
@@ -332,7 +349,7 @@ void display_func(void) {
 
                 if (squareChanged) {
                     brownCount++;
-                    drawSquare(squarePositions[i][0], squarePositions[i][1], false, squareHover[i]);
+                    drawDesk(squarePositions[i][0], squarePositions[i][1], false, squareHover[i]);
                     std::cout << "Score: " << brownCount << std::endl;
                 }
             }
