@@ -4,21 +4,57 @@
 #include <cstdlib>
 #include <ctime>
 
+
+// Triangle position
+float triangleX = 0.0f;
+float triangleY = -0.4f;
+
+// Square positions
+float squarePositions[6][2] = {
+    {-0.6f, 0.6f}, {0.0f, 0.6f}, {0.6f, 0.6f},
+    {-0.6f, 0.0f}, {0.0f, 0.0f}, {0.6f, 0.0f}
+};
+
+// Square colors
+bool squareColors[6] = {false, false, false, false, false, false}; // false: brown, true: red
+
+// Triangle movement speed
+float movementSpeed = 0.02f;
+
+// Key states
+bool keyW = false;
+bool keyA = false;
+bool keyS = false;
+bool keyD = false;
+bool keySpace = false;
+
+// Timer interval for changing square colors (in milliseconds)
+int timerInterval = 1000; // half a second
+// Timer ID
+int timerID;
+int maxTime = 20000; // 20 seconds
+
+
+// Counter for squares changed back to brown
+int brownCount = 0;
+
+bool squareHover[6] = {false, false, false, false, false, false};
+
+
 void drawHalfCircle(float x, float y, float radius) {
-   glColor3f(0.8588f, 0.6824f, 0.5804f);
-   glBegin(GL_LINE_LOOP); // Draw a line loop to connect segments
-   for (int i = 90; i <= 270; ++i) {
-       float angle = 2.0f * M_PI * (float)i / 360.0f;
-       float xPos = x + sin(angle) * radius;
-       float yPos = y + cos(angle) * radius;
-       glVertex2f(xPos, yPos);
-   }
-   glEnd();
+    glColor3f(0.8588f, 0.6824f, 0.5804f);
+    glBegin(GL_LINE_LOOP); // Draw a line loop to connect segments
+    for (int i = 90; i <= 270; ++i) {
+        float angle = 2.0f * M_PI * (float)i / 360.0f;
+        float xPos = x + sin(angle) * radius;
+        float yPos = y + cos(angle) * radius;
+        glVertex2f(xPos, yPos);
+    }
+    glEnd();
 }
 
 void drawPeople(float x, float y, bool isRed, bool isTeacher){
-
-   // Body
+// Body
     glBegin(GL_QUADS);
     glColor3f(1.0f, 0.7961f, 0.4118f);
     glVertex2f(x - 0.05f, y - 0.1f);
@@ -60,119 +96,88 @@ void drawPeople(float x, float y, bool isRed, bool isTeacher){
 
     drawHalfCircle(x, y + 0.01f, 0.02f);
 
-   // Raise hand
-   if(isRed){
-    glBegin(GL_LINES);
-    glColor3f(0.8588f, 0.6824f, 0.5804f);
-    glVertex2f(x + 0.05f, y - 0.03f);
-    glVertex2f(x + 0.1f, y + 0.03f);
-    glLineWidth(8.0f);
-    glEnd();
-   }
+    // Raise hand
+    if(isRed){
+        glBegin(GL_LINES);
+        glColor3f(0.8588f, 0.6824f, 0.5804f);
+        glVertex2f(x + 0.05f, y - 0.03f);
+        glVertex2f(x + 0.1f, y + 0.03f);
+        glLineWidth(8.0f);
+        glEnd();
+
+        //Hand
+        glBegin(GL_QUADS);
+        glColor3f(1.0f, 0.7961f, 0.4118f);
+        glVertex2f(x + 0.1f, y + 0.03f);
+        glVertex2f(x + 0.05f, y - 0.03f);
+        glVertex2f(x + 0.05f, y - 0.05f);
+        glVertex2f(x + 0.1f, y + 0.01f);
+        glEnd();
+
+        // Sleeve
+        glBegin(GL_QUADS);
+        glColor3f(0.4706f, 0.4902f, 0.3843f);
+        glVertex2f(x + 0.08f, y + 0.02f);
+        glVertex2f(x + 0.05f, y - 0.003f);
+        glVertex2f(x + 0.05f, y - 0.05f);
+        glVertex2f(x + 0.08f, y - 0.02f);
+        glEnd();
+    }
 }
 
+void drawSquare(float x, float y, bool isRed, bool isHovering) {
 
+    drawPeople(x, y + 0.1f, isRed, false);
 
-class Shape {
-public:
-    virtual void draw() = 0; // Pure virtual function to draw the shape
-};
-
-class Triangle : public Shape {
-private:
-    float x;
-    float y;
-public:
-    Triangle(float x, float y) : x(x), y(y) {}
-
-    void draw() override {
-        /*
-        glBegin(GL_TRIANGLES);
-        glColor3f(1.0f, 1.0f, 1.0f);
-        glVertex2f(x, y);
-        glVertex2f(x + 0.3f, y);
-        glVertex2f(x + 0.15f, y + 0.3f);
-        glEnd();*/
-
-        drawPeople(x, y, false, true);
-    }
-};
-
-class Square : public Shape {
-private:
-    float x;
-    float y;
-    bool isRed;
-public:
-    Square(float x, float y, bool isRed) : x(x), y(y), isRed(isRed) {}
-
-    void draw() override {
-        glBegin(GL_QUADS);
+    glBegin(GL_QUADS);
+    if (isHovering && isRed) {
+        glColor3f(1.0f, 0.7961f, 0.4118f); // Green color when hovering (&& if it is Red!)
+    } else {
         if (isRed) {
             glColor3f(1.0f, 0.0f, 0.0f); // Red color
         } else {
             glColor3f(0.6000f, 0.4824f, 0.4000f); // Brown color
         }
-        glVertex2f(x - 0.1f, y - 0.1f);
-        glVertex2f(x + 0.1f, y - 0.1f);
-        glVertex2f(x + 0.1f, y + 0.1f);
-        glVertex2f(x - 0.1f, y + 0.1f);
-        glEnd();
+    }
+    glVertex2f(x - 0.1f, y - 0.1f);
+    glVertex2f(x + 0.1f, y - 0.1f);
+    glVertex2f(x + 0.1f, y + 0.02f);
+    glVertex2f(x - 0.1f, y + 0.02f);
+    glEnd();
+}
+
+class Student{
+    float x;
+    float y;
+    bool isRed;
+    bool isTutor = false;
+public:
+    Student(float x, float y, bool isRed){
+        this->x = x;
+        this->y = y;
+        this->isRed = isRed;
+    }
+
+    virtual void draw(){
+        drawSquare(x, y, isRed, isTutor);   
     }
 };
 
-// Triangle position
-float triangleX = 0.0f;
-float triangleY = -0.4f;
+class Tutor : public Student{
+    float x;
+    float y;
+    bool isRed;
+    bool isTutor = true;
+public:
+    Tutor(float x = 0.0f, float y = -0.4f) : Student(x, y, false){}
 
-// Square positions
-float squarePositions[6][2] = {
-    {-0.6f, 0.6f}, {0.0f, 0.6f}, {0.6f, 0.6f},
-    {-0.6f, 0.0f}, {0.0f, 0.0f}, {0.6f, 0.0f}
+    void draw(){
+        drawPeople(x, y, isRed, isTutor);
+    }
+
 };
 
-// Square colors
-bool squareColors[6] = {false, false, false, false, false, false}; // false: brown, true: red
-
-// Triangle movement speed
-float movementSpeed = 0.02f;
-
-// Key states
-bool keyW = false;
-bool keyA = false;
-bool keyS = false;
-bool keyD = false;
-bool keySpace = false;
-
-// Timer interval for changing square colors (in milliseconds)
-int timerInterval = 500; // half a second
-// Timer ID
-int timerID;
-int maxTime = 20000; // 20 seconds
-
-
-// Counter for squares changed back to brown
-int brownCount = 0;
-
-bool squareHover[6] = {false, false, false, false, false, false};
-
-// Check if a point (x, y) is inside the square at (sx, sy)
-// bool isInsideSquare(float x, float y, float sx, float sy) {
-//     return (x >= sx - 0.1f && x <= sx + 0.1f && y >= sy - 0.1f && y <= sy + 0.1f);
-// }
-
-// bool isInsideTriangle(float x, float y, float x1, float y1, float x2, float y2, float x3, float y3) {
-//     // Compute barycentric coordinates
-//     float denominator = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
-//     float alpha = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / denominator;
-//     float beta = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / denominator;
-//     float gamma = 1.0f - alpha - beta;
-
-//     // Check if the point is inside the triangle
-//     return alpha > 0 && beta > 0 && gamma > 0;
-// }
-
-bool isInsideTriangle(float x, float y, float rectX, float rectY){
+bool isInsideDesk(float x, float y, float rectX, float rectY){
     bool answer = false;
     // x and y are inside the bounded region of the rectangle's x and y values
     if(x*2 >= rectX - 0.15f && x*2 <= rectX + 0.15f && y*2 >= rectY - 0.12f && y*2 <= rectY + 0.12f){
@@ -227,11 +232,9 @@ void changeSquareColors(int value) {
         glutTimerFunc(timerInterval, changeSquareColors, 0);
     } else {
         // Delay before terminating
-        glutTimerFunc(8000, terminateCode, 0);
+        glutTimerFunc(30000, terminateCode, 0);
     }
 }
-
-
 
 // CALLBACKS
 void idle_func() {
@@ -286,27 +289,6 @@ void key_released(unsigned char key, int x, int y) {
     }
 }
 
-void drawSquare(float x, float y, bool isRed, bool isHovering) {
-
-    drawPeople(x, y + 0.1f, isRed, false);
-
-    glBegin(GL_QUADS);
-    if (isHovering && isRed) {
-        glColor3f(1.0f, 0.7961f, 0.4118f); // Green color when hovering (&& if it is Red!)
-    } else {
-        if (isRed) {
-            glColor3f(1.0f, 0.0f, 0.0f); // Red color
-        } else {
-            glColor3f(0.6000f, 0.4824f, 0.4000f); // Brown color
-        }
-    }
-    glVertex2f(x - 0.1f, y - 0.1f);
-    glVertex2f(x + 0.1f, y - 0.1f);
-    glVertex2f(x + 0.1f, y + 0.02f);
-    glVertex2f(x - 0.1f, y + 0.02f);
-    glEnd();
-}
-
 void display_func(void) {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -322,51 +304,9 @@ void display_func(void) {
     if (keyS && triangleY - movementSpeed >= -0.5f) triangleY -= movementSpeed;
     if (keyD && triangleX + movementSpeed <= 0.5f) triangleX += movementSpeed;
 
-    // Check if the space bar is pressed and handle interactions
-    /*
-    if (keySpace) {
-        std::cout << "space pressed" << std::endl;
-        bool squareChanged = false; // Flag to track if any square color was changed
-    
-        for (int i = 0; i < 6; ++i) {
-            squareHover[i] = isInsideTriangle(triangleX, triangleY, 
-                                           squarePositions[i][0], squarePositions[i][1]);
-            // if (isInsideTriangle(triangleX, triangleY, 
-            //                      squarePositions[i][0] - 0.1f, squarePositions[i][1] - 0.1f, 
-            //                      squarePositions[i][0] + 0.1f, squarePositions[i][1] - 0.1f, 
-            //                      squarePositions[i][0], squarePositions[i][1] + 0.1f)) {
-            if(squareHover[i]){
-                std::cout << "is in square: (" << squarePositions[i][0] << ", " <<  squarePositions[i][1] << ")" << std::endl;
-    
-                drawSquare(squarePositions[i][0], squarePositions[i][1], false, squareHover[i]);
-                std::cout << "square color changed" << std::endl; 
-                brownCount++;
-                std::cout << "count: " << brownCount << std::endl; 
-    
-                // If the square is red, change its color to brown
-                if (squareColors[i]) {
-                    squareColors[i] = false;
-                    std::cout << "color changed" << std::endl;
-                    squareChanged = true;
-                    break; // Exit the loop after changing the color of the first touched square
-                }
-            }
-        }
-    
-        // Increment the brown count only if a square color was changed
-        if (squareChanged) {
-            brownCount++;
-            std::cout << "count: " << brownCount << std::endl;
-        }
-    }*/
-
     for (int i = 0; i < 6; ++i) {
-        squareHover[i] = isInsideTriangle(triangleX, triangleY, 
+        squareHover[i] = isInsideDesk(triangleX, triangleY, 
                                         squarePositions[i][0], squarePositions[i][1]);
-        // if (isInsideTriangle(triangleX, triangleY, 
-        //                      squarePositions[i][0] - 0.1f, squarePositions[i][1] - 0.1f, 
-        //                      squarePositions[i][0] + 0.1f, squarePositions[i][1] - 0.1f, 
-        //                      squarePositions[i][0], squarePositions[i][1] + 0.1f)) {
         if(squareHover[i]){
             if (keySpace) {
                 // std::cout << "space pressed" << std::endl;
@@ -389,25 +329,10 @@ void display_func(void) {
         }
     }
 
-    // for (int i = 0; i < 6; ++i) {
-    //     // squareHover[i] = isInsideTriangle(triangleX, triangleY, 
-    //     //                                    squarePositions[i][0] - 0.1f, squarePositions[i][1] - 0.1f, 
-    //     //                                    squarePositions[i][0] + 0.1f, squarePositions[i][1] - 0.1f, 
-    //     //                                    squarePositions[i][0], squarePositions[i][1] + 0.1f);
-    //     squareHover[i] = isInsideTriangle(triangleX, triangleY, 
-    //                                        squarePositions[i][0], squarePositions[i][1]);
-    // }
 
     // Draw the triangle at its updated position
     glPushMatrix();
     glTranslatef(triangleX, triangleY, 0.0f);
-    /*
-    glBegin(GL_TRIANGLES);
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glVertex2f(0.1f, 0.1f);
-    glVertex2f(0.4f, 0.1f);
-    glVertex2f(0.25f, 0.4f);
-    glEnd();*/
     drawPeople(triangleX, triangleY, false, true);
     glPopMatrix();
 
@@ -419,7 +344,7 @@ void display_func(void) {
 
     int xPos = 30; // Initial X position
     int yPos = 130; // Initial Y position
-    std::string text = "Goal: Help as many students within 20 seconds!\nAbilities!\n\tMovement: W,A,S,D keys\n\tHelp students: Press space key\nNumber of students you've helped: " + std::to_string(brownCount);
+    std::string text = "Goal: You are a Tutor! Help as many students within 20 seconds!\nAbilities!\n\tMovement: W,A,S,D keys\n\tHelp students: Press space key\nNumber of students you've helped: " + std::to_string(brownCount);
     renderText(text, xPos, yPos);
 
     
@@ -446,9 +371,6 @@ void init(void) {
 
     std::cout << "Finished initializing...\n\n";
 }
-
-
-
 
 // MAIN
 int main(int argc, char** argv) {
