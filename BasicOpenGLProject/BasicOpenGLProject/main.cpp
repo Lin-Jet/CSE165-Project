@@ -4,6 +4,16 @@
 #include <cstdlib>
 #include <ctime>
 
+// This is Final Draft
+/* == Tutoring Center At UC Merced Simulator ==
+    In this game you are a tutor at UC Merced! Your goal is to help as many students as possible in 20 seconds.
+
+    Actions:
+    Move with the 'W','A','S', and 'D' keys
+    Help with the Space bar
+
+    You can only help the students at their desk so move to their desks and help them out!
+*/
 
 // Triangle position
 float triangleX = 0.0f;
