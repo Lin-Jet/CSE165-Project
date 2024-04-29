@@ -29,7 +29,7 @@ float squarePositions[6][2] = {
 bool squareColors[6] = {false, false, false, false, false, false}; // false: brown, true: red
 
 // Triangle movement speed
-float movementSpeed = 0.02f;
+float movementSpeed = 0.03f;
 
 // Key states
 bool keyW = false;
@@ -69,6 +69,18 @@ public:
         this->x = x;
         this->y = y;
         this->isRed = isRed;
+    }
+
+    // Overload the assignment operator (=)
+    Student& operator=(const Student& other) {
+        if (this != &other) {
+            // Copy member variables from the other Student object
+            // Replace these with your actual member variables
+            x = other.x;
+            y = other.y;
+            isRed = other.isRed;
+        }
+        return *this; // Return a reference to this object
     }
 
     virtual void draw(){
@@ -198,27 +210,25 @@ public:
 /* == Creating Tutor and 6 Students == */
 Tutor *you = new Tutor();
 Student *students = new Student[6];
-for(int i = 0; i < 6; i++){
-    students[i] = new Student(squarePositions[i][0], squarePositions[i][1], squareColors[i]);
-}
 
 bool isInsideDesk(float x, float y, float rectX, float rectY){
     bool answer = false;
     // x and y are inside the bounded region of the rectangle's x and y values
-    if(x*2 >= rectX - 0.15f && x*2 <= rectX + 0.15f && y*2 >= rectY - 0.12f && y*2 <= rectY + 0.12f){
+    if(x >= rectX - 0.15f && x <= rectX + 0.15f && y >= rectY - 0.12f && y <= rectY + 0.12f){
         answer = true;
     }
     return answer;
 }
 
 void terminateCode(int value){
+    // No Overflow!
     delete you;
+    delete [] students;
 
     exit(0);
 }
 
 void renderText(const std::string& text, int xPos, int yPos) {
-    // std::cout << text << std::endl;
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -322,34 +332,31 @@ void display_func(void) {
 
     // Draw squares
     for (int i = 0; i < 6; ++i) {
-        drawDesk(squarePositions[i][0], squarePositions[i][1], squareColors[i], squareHover[i]);
+        students[i].drawDesk(squarePositions[i][0], squarePositions[i][1], squareColors[i], squareHover[i]);
     }
 
     // Update triangle position based on key presses
-    if (keyW && triangleY + movementSpeed <= 0.5f) triangleY += movementSpeed;
-    if (keyA && triangleX - movementSpeed >= -0.5f) triangleX -= movementSpeed;
-    if (keyS && triangleY - movementSpeed >= -0.5f) triangleY -= movementSpeed;
-    if (keyD && triangleX + movementSpeed <= 0.5f) triangleX += movementSpeed;
+    if (keyW && triangleY + movementSpeed <= 1.0f) triangleY += movementSpeed;
+    if (keyA && triangleX - movementSpeed >= -1.0f) triangleX -= movementSpeed;
+    if (keyS && triangleY - movementSpeed >= -1.0f) triangleY -= movementSpeed;
+    if (keyD && triangleX + movementSpeed <= 1.0f) triangleX += movementSpeed;
 
     for (int i = 0; i < 6; ++i) {
         squareHover[i] = isInsideDesk(triangleX, triangleY, 
                                         squarePositions[i][0], squarePositions[i][1]);
         if(squareHover[i]){
             if (keySpace) {
-                // std::cout << "space pressed" << std::endl;
                 bool squareChanged = false; // Flag to track if any square color was changed
 
                 // If the square is red, change its color to brown
                 if (squareColors[i]) {
                     squareColors[i] = false;
-                    // std::cout << "color changed" << std::endl;
                     squareChanged = true;
-                    // break; // Exit the loop after changing the color of the first touched square
                 }
 
                 if (squareChanged) {
                     brownCount++;
-                    drawDesk(squarePositions[i][0], squarePositions[i][1], false, squareHover[i]);
+                    students[i].drawDesk(squarePositions[i][0], squarePositions[i][1], false, squareHover[i]);
                     std::cout << "Score: " << brownCount << std::endl;
                 }
             }
@@ -360,7 +367,7 @@ void display_func(void) {
     // Draw the triangle at its updated position
     glPushMatrix();
     glTranslatef(triangleX, triangleY, 0.0f);
-    drawPeople(triangleX, triangleY, false, true);
+    you->draw();
     glPopMatrix();
 
     // Render text
@@ -405,6 +412,12 @@ int main(int argc, char** argv) {
     std::cout << "Abilities!" << std::endl;
     std::cout << "Movement: W,A,S,D keys" << std::endl;
     std::cout << "Help students: Press space key" << std::endl;
+
+    Student s;
+    for(int i = 0; i < 6; i++){
+        s.setStudent(squarePositions[i][0], squarePositions[i][1], squareColors[i]);
+        students[i] = s;
+    }
 
     glutInit(&argc, argv);
     glutInitWindowPosition(100, 100);
