@@ -29,7 +29,7 @@ float squarePositions[6][2] = {
 bool squareColors[6] = {false, false, false, false, false, false}; // false: brown, true: red
 
 // Triangle movement speed
-float movementSpeed = 0.03f;
+float movementSpeed = 0.05f;
 
 // Key states
 bool keyW = false;
